@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Home - Book Verse</title>
+  <link rel="stylesheet" href="home.css">
+</head>
+<body class="light-gradient">
+  <header>
+    <h1>📚 Book Verse</h1>
+    <div class="top-nav">
+      <a href="cart.html">Cart 🛒</a>
+      <a href="wishlist.html">Wishlist ❤️</a>
+      <a href="orders.html">Orders 📦</a>
+      <a href="login.html">Logout 🚪</a>
+    </div>
+  </header>
+
+  <!-- Centered Search Bar -->
+  <div class="search-wrapper">
+    <input type="text" id="searchInput" placeholder="Search books by title..." />
+  </div>
+
+  <main>
+    <div id="booksContainer" class="book-grid"></div>
+  </main>
+
+  <!-- Modal for description -->
+  <div id="bookModal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeModal()">×</span>
+      <h2 id="modalTitle"></h2>
+      <img id="modalImage" src="" alt="Book Image"/>
+      <p id="modalDescription"></p>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast"></div>
+
+  <script>
+    const books = [
+      {id: 1, title: "The Alchemist", price: 199, img: "images/TheAlchemist.jpg", description: "A journey of self-discovery by Paulo Coelho"},
+      {id: 2, title: "Atomic Habits", price: 299, img: "images/Atomic Habits.jpg", description: "A guide to building good habits by James Clear"},
+      {id: 3, title: "Deep Work", price: 249, img: "images/Deep Work.jpg", description: "Focused success in a distracted world by Cal Newport"},
+      {id: 4, title: "To Kill a mockingbird", price: 175, img: "images/To Kill A Mockingbird.jpg", description: "A powerful story about racial injustice and moral growth in the American South by Harper Lee"},
+      {id: 5, title: "1984", price: 279, img: "images/book1984.jpg", description: "A dystopian novel warning against totalitarianism and the loss of individuality by George Orwell"},
+      {id: 6, title: "Pride and Prejudice", price: 169, img: "images/Pride and Prejudice.jpg", description: "A witty romantic novel exploring manners, marriage, and society in 19th-century England by Jane Austen"},
+      {id: 7, title: "The Great Gatsby", price: 129, img: "images/The great Gatsby.jpg", description: "A tragic love story set in the Jazz Age, exploring wealth and the American Dream by F.Scott Fitzgerald"},
+      {id: 8, title: "The Catcher and the Rye", price: 249, img: "images/The Catcher in the Rye.jpg", description: "A coming-of-age tale about teenage rebellion and alienation in post-war America by J.D. Salinger"},
+      {id: 9, title: "Jane Eyre", price: 319, img: "images/Jane Eyre.jpg", description: "A gothic romance following a young woman’s moral and spiritual growth by Charlotte Bronte"},
+      {id: 10, title: "Animal Farm", price: 239, img: "images/Animal Farm.jpg", description: "A political allegory that critiques the corruption of revolution and power by George Orwell"},
+      {id: 11, title: "Brave New World", price: 199, img: "images/Brave New World.jpg", description: "A dystopian novel exploring the dangers of a technologically controlled society by Aldous Huxley"},
+      {id: 12, title: "The Picture of Dorian Gray", price: 299,img: "images/The Picture of Dorian Gray.jpg", description: "A philosophical novel about vanity,morality, and the nature of beauty by Oscar Wilde"},
+      {id: 13, title: "The Hobbit", price: 199,img: "images/The Hobbit.jpg", description: "A fantasy adventure following Bilbo Bagginns on a quest to reclaim a treasure guarded by a dragon by J.R.R. Tolkien"},
+      
+    ];
+
+    const container = document.getElementById('booksContainer');
+    const searchInput = document.getElementById('searchInput');
+
+    function renderBooks(filter = "") {
+      container.innerHTML = "";
+      const filtered = books.filter(book => book.title.toLowerCase().includes(filter.toLowerCase()));
+      filtered.forEach(book => {
+        const div = document.createElement('div');
+        div.className = "book-card";
+        div.innerHTML = `
+          <img src="${book.img}" alt="${book.title}" onclick="showDescription(${book.id})">
+          <h3>${book.title}</h3>
+          <p>₹${book.price}</p>
+          <button onclick="addToCart(${book.id})">Add to Cart</button>
+          <button onclick="addToWishlist(${book.id})">Add to Wishlist</button>
+          <button onclick="buyNow(${book.id})">Buy Now</button>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.innerText = message;
+      toast.style.display = 'block';
+      setTimeout(() => toast.style.display = 'none', 2500);
+    }
+
+    function showDescription(id) {
+      const book = books.find(b => b.id === id);
+      document.getElementById('modalTitle').innerText = book.title;
+      document.getElementById('modalImage').src = book.img;
+      document.getElementById('modalDescription').innerText = book.description;
+      document.getElementById('bookModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('bookModal').style.display = 'none';
+    }
+
+    function addToCart(id) {
+      let cart = JSON.parse(localStorage.getItem("cart")) || [];
+      if (!cart.some(item => item.id === id)) {
+        const book = books.find(b => b.id === id);
+        cart.push(book);
+        localStorage.setItem("cart", JSON.stringify(cart));
+        showToast("Book added to cart");
+      } else {
+        showToast("Book already in cart");
+      }
+    }
+
+    function addToWishlist(id) {
+      let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
+      if (!wishlist.some(item => item.id === id)) {
+        const book = books.find(b => b.id === id);
+        wishlist.push(book);
+        localStorage.setItem("wishlist", JSON.stringify(wishlist));
+        showToast("Book added to wishlist");
+      } else {
+        showToast("Book already in wishlist");
+      }
+    }
+
+    function buyNow(id) {
+      let orders = JSON.parse(localStorage.getItem("orders")) || [];
+      const book = books.find(b => b.id === id);
+      orders.push(book);
+      localStorage.setItem("orders", JSON.stringify(orders));
+      showToast("Book ordered");
+      setTimeout(() => window.location.href = "orders.html", 1200);
+    }
+
+    searchInput.addEventListener('input', e => renderBooks(e.target.value));
+    renderBooks();
+  </script>
+</body>
+</html>

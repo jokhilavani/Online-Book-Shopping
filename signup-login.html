@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Signup & Login - Book Verse</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .container {
+      perspective: 1000px;
+      width: 400px;
+      height: 500px;
+      position: relative;
+    }
+
+    .card {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      transition: transform 1s;
+      transform-style: preserve-3d;
+    }
+
+    .flip .card {
+      transform: rotateY(180deg);
+    }
+
+    .form {
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+    }
+
+    .form h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .form input {
+      width: 100%;
+      padding: 12px 15px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 10px;
+      background: #f1f1f1;
+      transition: 0.3s;
+    }
+
+    .form input:focus {
+      outline: none;
+      background: #e0e0e0;
+    }
+
+    .form button {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, #70e1f5 0%, #ffd194 100%);
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      margin-top: 15px;
+      cursor: pointer;
+      transition: 0.4s;
+    }
+
+    .form button:hover {
+      transform: scale(1.05);
+    }
+
+    .form p {
+      text-align: center;
+      margin-top: 20px;
+      color: #666;
+    }
+
+    .form p span {
+      color: #007bff;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .login {
+      transform: rotateY(180deg);
+    }
+
+    /* Toast popup */
+    #toast {
+      visibility: hidden;
+      min-width: 250px;
+      margin-left: -125px;
+      background-color: #333;
+      color: #fff;
+      text-align: center;
+      border-radius: 8px;
+      padding: 14px;
+      position: fixed;
+      z-index: 1;
+      left: 50%;
+      bottom: 30px;
+      font-size: 16px;
+    }
+
+    #toast.show {
+      visibility: visible;
+      animation: fadein 0.5s, fadeout 0.5s 2.5s;
+    }
+
+    @keyframes fadein {
+      from { bottom: 0; opacity: 0; }
+      to { bottom: 30px; opacity: 1; }
+    }
+
+    @keyframes fadeout {
+      from { bottom: 30px; opacity: 1; }
+      to { bottom: 0; opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card" id="flip-card">
+      <!-- Signup Form -->
+      <div class="form signup">
+        <h2>Create Account</h2>
+        <input type="text" id="signup-name" placeholder="Full Name" required />
+        <input type="email" id="signup-email" placeholder="Email" required />
+        <input type="password" id="signup-password" placeholder="Password" required />
+        <button onclick="handleSignup()">Signup</button>
+        <p>Already have an account? <span onclick="flipCard()">Login</span></p>
+      </div>
+
+      <!-- Login Form -->
+      <div class="form login">
+        <h2>Login</h2>
+        <input type="email" id="login-email" placeholder="Email" required />
+        <input type="password" id="login-password" placeholder="Password" required />
+        <button onclick="handleLogin()">Login</button>
+        <p>Don't have an account? <span onclick="flipCard()">Signup</span></p>
+
+      </div>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+
+  <script>
+    function flipCard() {
+      document.querySelector('.container').classList.toggle('flip');
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.className = "show";
+      setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
+    }
+
+    function handleSignup() {
+      const name = document.getElementById("signup-name").value;
+      const email = document.getElementById("signup-email").value;
+      const password = document.getElementById("signup-password").value;
+
+      if (!name || !email || !password) {
+        showToast("Please fill all fields.");
+        return;
+      }
+
+      localStorage.setItem("user", JSON.stringify({ name, email, password }));
+      showToast("Signup Successful!");
+      setTimeout(() => {
+        flipCard(); // Go to login after signup
+      }, 1000);
+    }
+
+    function handleLogin() {
+      const email = document.getElementById("login-email").value;
+      const password = document.getElementById("login-password").value;
+      const user = JSON.parse(localStorage.getItem("user"));
+
+      if (!email || !password) {
+        showToast("Enter email and password.");
+        return;
+      }
+
+      if (user && user.email === email && user.password === password) {
+        showToast("Login Successful!");
+        setTimeout(() => {
+          window.location.href = "home.html"; // Redirect to home
+        }, 1000);
+      } else {
+        showToast("Invalid credentials.");
+      }
+      function login() {
+    const username = document.getElementById("loginUsername").value;
+    const password = document.getElementById("loginPassword").value;
+
+    const storedPassword = localStorage.getItem(username);
+
+    if (storedPassword === password) {
+        localStorage.setItem("loggedInUser", username);
+        alert("Login successful!");
+        window.location.href = "home.html"; // ✅ Redirect to Home Page
+    } else {
+        alert("Invalid username or password.");
+    }
+}
+
+    }
+  </script>
+</body>
+</html>

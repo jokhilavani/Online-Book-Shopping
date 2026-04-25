@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Cart - Book Verse</title>
+  <link rel="stylesheet" href="cart.css" />
+</head>
+<body>
+  <nav>
+    <a href="home.html">Home</a>
+    <a href="cart.html" class="active">Cart</a>
+    <a href="wishlist.html">Wishlist</a>
+    <a href="orders.html">Orders</a>
+    <a href="login.html">Logout</a>
+  </nav>
+  <h1>Your Cart</h1>
+  <div id="cartItems" class="item-list"></div>
+
+  <script>
+    const cartItems = JSON.parse(localStorage.getItem('cart')) || [];
+
+    const cartContainer = document.getElementById('cartItems');
+    cartContainer.innerHTML = cartItems.length ? '' : '<p>No items in cart</p>';
+
+    cartItems.forEach((item, index) => {
+      const div = document.createElement('div');
+      div.className = 'book-card';
+      div.innerHTML = `
+        <img src="${item.image}" alt="${item.title}">
+        <h3>${item.title}</h3>
+        <p>${item.description}</p>
+        <p>Price: ₹${item.price}</p>
+        <button onclick="buyNow(${index})">Buy Now</button>
+        <button onclick="removeFromCart(${index})">Remove</button>
+      `;
+      cartContainer.appendChild(div);
+    });
+
+    function removeFromCart(index) {
+      cartItems.splice(index, 1);
+      localStorage.setItem('cart', JSON.stringify(cartItems));
+      location.reload();
+    }
+
+    function buyNow(index) {
+      const orders = JSON.parse(localStorage.getItem('orders')) || [];
+      orders.push(cartItems[index]);
+      localStorage.setItem('orders', JSON.stringify(orders));
+      alert('Order placed successfully!');
+    }
+    app.post('/cart', (req, res) => {
+  const { userId, bookId } = req.body;
+  const sql = 'INSERT INTO cart (user_id, book_id) VALUES (?, ?)';
+  db.query(sql, [userId, bookId], err => {
+    if (err) return res.status(500).json({ message: 'Error adding to cart', error: err });
+    res.json({ message: 'Book added to cart' });
+  });
+});
+app.get('/cart/:userId', (req, res) => {
+  const { userId } = req.params;
+  const sql = 'SELECT * FROM cart WHERE user_id = ?';
+  db.query(sql, [userId], (err, results) => {
+    if (err) return res.status(500).json({ message: 'Error fetching cart items' });
+    res.json(results);
+  });
+});
+
+
+  </script>
+</body>
+</html>
